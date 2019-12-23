@@ -10,7 +10,7 @@
 
 
 This tool is used to plot and analyse TYPE II solar radio bursts from the spectrographic data of GLOSS 
-- Gauribidanur LOw frequency Solar Spectrograph. 
+ Gauribidanur LOw frequency Solar Spectrograph. 
 
 This is developed using python3 package tkinter.
 
@@ -20,7 +20,7 @@ will work with this tool.
 
 
 
-####################################################################################################
+###############################################################################################
 
 First install python3 from the official python website 
 
@@ -30,7 +30,8 @@ from terminal by typing
 
 "sudo apt-get install python3"
 
-#####################################################################################################
+###############################################################################################
+
 If you dont have 'pip' installed, get it by typing 
 
 "sudo apt-get install python3-pip" 
@@ -41,7 +42,7 @@ or
 
 If you have 'pip' installed, upgrade it by "python3 -m pip install --upgrade pip"
 
-#####################################################################################################
+################################################################################################
 
 Now to install all the required packages for this plotting tool, run this command
 
@@ -50,7 +51,7 @@ Now to install all the required packages for this plotting tool, run this comman
 in the terminal
 
 
-######################################################################################################
+#################################################################################################
 
 
 If all the packages are installed you can proceed with opening the tool by typing
