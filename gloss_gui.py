@@ -14,7 +14,8 @@ matplotlib.use('tkagg')
 from astropy.io import fits
 import numpy as np
 import tkinter as tk
-from tkinter import * #Tk,Frame,messagebox,Menu,Text
+from tkinter import Tk,Frame,messagebox,Menu,Text,filedialog
+from tkinter import *
 import os
 import datetime
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
