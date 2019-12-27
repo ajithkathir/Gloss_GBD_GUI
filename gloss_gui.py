@@ -10,7 +10,7 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('tkagg')
-from scipy.signal import savgol_filter
+
 from astropy.io import fits
 import numpy as np
 import tkinter as tk
@@ -29,10 +29,11 @@ def find_nearest(array, value):
 
 
 def time():
-    global now
+    global now,nowdt
     no=str(datetime.datetime.now()) #.strftime('%H:%M:%S,%f')[:-7])
     now=no[0:19]
-    return now
+    nowdt=no[0:10]
+    return now,nowdt
 
 
 
@@ -108,6 +109,12 @@ def enablingstart():
     manalys.entryconfigure("Start", state=tk.NORMAL)    
 def disablingstart():
     manalys.entryconfigure("Start", state=tk.DISABLED)   
+
+def enablinganalysn():
+    manalys.entryconfigure("DiffFactor", state=tk.NORMAL)    
+def disablinganalysn():
+    manalys.entryconfigure("DiffFactor", state=tk.DISABLED)   
+   
     
 def enablingselect():
     manalys.entryconfigure("Select points", state=tk.NORMAL)    
@@ -209,10 +216,11 @@ def readnplot():
         #ax1 = plt.subplot2grid((4, 4), (0, 3), rowspan=3,sharey=ax)
         ax1.set_title("Freq (in MHz) profile "+str(round(centretime,4))+"UT",fontsize="12",color="white")
         ax1.spines['bottom'].set_color('white')
-        ax1.spines['left'].set_color('white')
+        ax1.spines['right'].set_color('white')
         ax1.tick_params(axis='x', colors='white')
         ax1.tick_params(axis='y', colors='white')
         ax1.plot(imdata[:,int(imdata.shape[1]/2)],ff)   
+        ax1.invert_xaxis()
         ax1.set_xlabel('Amplitude (dBm)',color='white')
         #ax1=fig.add_subplot(332)
     
@@ -260,11 +268,13 @@ def readnplot():
     ax1 = plt.subplot2grid((4, 4), (0, 3), rowspan=3,sharey=ax)
     ax1.set_title("Freq (in MHz) profile "+str(round(tt[int(tt.shape[0]/2)],5))+"UT",fontsize="12",color="white")
     ax1.spines['bottom'].set_color('white')
-    ax1.spines['left'].set_color('white')
+    ax1.spines['right'].set_color('white')
     ax1.tick_params(axis='x', colors='white')
     ax1.tick_params(axis='y', colors='white')
-    ax1.plot(imdata[:,int(imdata.shape[1]/2)],ff)   
+    ax1.plot(imdata[:,int(imdata.shape[1]/2)],ff)  
+    ax1.invert_xaxis()
     ax1.set_xlabel('Amplitude (dBm)',color='white')
+    ax1.yaxis.set_ticks_position('right')
     #ax1=fig.add_subplot(332)
     ax2 = plt.subplot2grid((4, 4), (3, 0), colspan=3,sharex=ax)
     ax2.spines['bottom'].set_color('white')
@@ -272,6 +282,7 @@ def readnplot():
     ax2.tick_params(axis='x', colors='white')
     ax2.tick_params(axis='y', colors='white')
     ax2.set_ylabel('Amplitude (dBm)',color='white')
+    
     #ax3 = plt.subplot2grid((4, 4), (3, 3))
     ax2.plot(tt,imdata[int(imdata.shape[0]/2),:])
     ax2.set_xlabel("Time (in UT) profile at "+str(round(ff[int(ff.shape[0]/2)],5))+"MHz",fontsize="12",color="white")
@@ -425,9 +436,10 @@ def analysisclick():
                 ax1.set_title("Freq profile at "+str(round(xdata,5))+" hrs UTC",fontsize="12",color="white")
                 ax1.set_xlabel('Amplitude (dBm)',color='white')
                 ax1.spines['bottom'].set_color('white')
-                ax1.spines['left'].set_color('white')
+                ax1.spines['right'].set_color('white')
                 ax1.tick_params(axis='x', colors='white')
                 ax1.tick_params(axis='y', colors='white')
+                ax1.yaxis.set_ticks_position('right')
                 
                 cut2=np.linspace(0,(imdata.shape[1]-1),imdata.shape[1])
                 cutfreq=imdata[freq_indx[0][0],:]
@@ -537,9 +549,12 @@ def deletealldots():
         stop=True
                
         fig.canvas.get_tk_widget().delete("dot")
-        global fp,t
+        fig.canvas.get_tk_widget().delete("line")
+        
+        global fp,t,evnts
         fp=[]
-        t=[]   
+        t=[] 
+        evnts=[]
         #print(fp)
         time()
         text.config(state=NORMAL)
@@ -576,9 +591,9 @@ def mediansub():
     
     
     
-def analysis():
+def analysis(Sc):
     #print(evnts)
-    fig.canvas.get_tk_widget().create_line(evnts,width=2)
+    fig.canvas.get_tk_widget().create_line(evnts,width=2,tags=["line"])
     
     global wb,sheet1
     wb = xl.Workbook()
@@ -655,7 +670,7 @@ def analysis():
         #fp = sqrt(Ne(i))*(9*10^(-3)) 
         
         
-        Sc = 1 #tk.simpledialog.askfloat('Enter Enhancement factor','Enter Enhancement Factor')
+        #Sc = 1 #tk.simpledialog.askfloat('Enter Enhancement factor','Enter Enhancement Factor')
     
         if Sc != None:
                    
@@ -800,7 +815,8 @@ def analysis():
                 
                 
             velocities=(Vnk,Vba1,Vba2,Vsa,Vsgc,Vsgp,Vhy,Vlb)
-            las=filedialog.askopenfile(initialdir='pwd',title='select lasco file for overplotting',filetypes = (("yht files","*.yht"),("all files","*.*")))            
+            
+            las=filedialog.askopenfile(parent=mainwin,initialdir='pwd',title='select lasco file for overplotting',filetypes = (("yht files","*.yht"),("all files","*.*")))            
             #print(las.name)
             lasco=np.loadtxt((las.name),comments="#",delimiter="\t",dtype=str)
             
@@ -829,11 +845,11 @@ def analysis():
                 text.see(tk.END)
                 text.config(state=DISABLED)
                 
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Newkirk Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(1,1,str(fppoly))
@@ -842,7 +858,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(1,2,str(drpoly))
@@ -851,7 +867,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[0])
-                htfit=np.polyfit(t, heights[0], 4)
+                htfit=np.polyfit(t, heights[0], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(1,3,str(htpoly))
@@ -862,15 +878,13 @@ def analysis():
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[0])
                          
-                vfit=np.polyfit(t_av, velocities[0], 4)
+                vfit=np.polyfit(t_av, velocities[0], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(1,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                
-                plt.suptitle("Newkirk Model")
-                
+            
                 plt.subplot(313)
                 plt.plot(t,heights[0],marker='o', linestyle='--')
                 
@@ -892,6 +906,11 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global newfit
+                
+                newfit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return newfit
                 
             def BaumbachAllen_Model1():
                 text.config(state=NORMAL)
@@ -901,11 +920,11 @@ def analysis():
                 
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Baumbach-Allen Model - 1")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(2,1,str(fppoly))
@@ -914,7 +933,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(2,2,str(drpoly))
@@ -923,7 +942,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[1])
-                htfit=np.polyfit(t, heights[1], 4)
+                htfit=np.polyfit(t, heights[1], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(2,3,str(htpoly))
@@ -932,13 +951,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[1])
-                vfit=np.polyfit(t_av, velocities[1], 4)
+                vfit=np.polyfit(t_av, velocities[1], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(2,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Baumbach-Allen Model1 Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[1],marker='o', linestyle='--')
@@ -961,6 +979,12 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global ba1fit
+                
+                ba1fit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return ba1fit
+                
             def BaumbachAllen_Model2():
                 text.config(state=NORMAL)
                 time()
@@ -968,11 +992,11 @@ def analysis():
                 text.insert(tk.END,now+"    Baumbach-Allen Model2 velocity values="+str(velocities[2])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Baumbach-Allen Model - 2")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(3,1,str(fppoly))
@@ -981,7 +1005,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(3,2,str(drpoly))
@@ -990,7 +1014,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[2])
-                htfit=np.polyfit(t, heights[2], 4)
+                htfit=np.polyfit(t, heights[2], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(3,3,str(htpoly))
@@ -999,13 +1023,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[2])
-                vfit=np.polyfit(t_av, velocities[2], 4)
+                vfit=np.polyfit(t_av, velocities[2], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(3,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Baumbach-Allen Model2 Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[2],marker='o', linestyle='--')
@@ -1028,6 +1051,14 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                
+                global ba2fit
+                ba2fit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return ba2fit
+                
+                
+                
             def SaitoModel():    
                 text.config(state=NORMAL)
                 time()
@@ -1035,11 +1066,11 @@ def analysis():
                 text.insert(tk.END,now+"    Saito Model velocity values="+str(velocities[3])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Saito Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(4,1,str(fppoly))
@@ -1048,7 +1079,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(4,2,str(drpoly))
@@ -1057,7 +1088,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[3])
-                htfit=np.polyfit(t, heights[3], 4)
+                htfit=np.polyfit(t, heights[3], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(4,3,str(htpoly))
@@ -1066,13 +1097,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[3])
-                vfit=np.polyfit(t_av, velocities[3], 4)
+                vfit=np.polyfit(t_av, velocities[3], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(4,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Saito Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[3],marker='o', linestyle='--')
@@ -1095,6 +1125,11 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global saitofit
+                saitofit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return saitofit
+                
             def SittleGuhathakurtaCurrent_model():
                 
                 text.config(state=NORMAL)
@@ -1103,11 +1138,11 @@ def analysis():
                 text.insert(tk.END,now+"    Sittler & Guhathakurta Current Sheet model velocity values="+str(velocities[3])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Sittler & Guhathakurta Current Sheet Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(5,1,str(fppoly))
@@ -1116,7 +1151,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(5,2,str(drpoly))
@@ -1125,7 +1160,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[4])
-                htfit=np.polyfit(t, heights[4], 4)
+                htfit=np.polyfit(t, heights[4], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(5,3,str(htpoly))
@@ -1134,13 +1169,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[4])
-                vfit=np.polyfit(t_av, velocities[4], 4)
+                vfit=np.polyfit(t_av, velocities[4], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(5,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Sittler & Guhathakurta Current Sheet Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[4],marker='o', linestyle='--')
@@ -1163,6 +1197,12 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global sgcfit
+                sgcfit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return sgcfit
+                
+                
             def SittleGuhathakurtaPolar_model():
                 
                 text.config(state=NORMAL)
@@ -1171,11 +1211,11 @@ def analysis():
                 text.insert(tk.END,now+"    Sittler & Guhathakurta Polar coronal hole model  velocity values="+str(velocities[5])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Sittler & Guhathakurta Polar coronal hole Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(6,1,str(fppoly))
@@ -1184,7 +1224,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(6,2,str(drpoly))
@@ -1193,7 +1233,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[5])
-                htfit=np.polyfit(t, heights[5], 4)
+                htfit=np.polyfit(t, heights[5], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(6,3,str(htpoly))
@@ -1202,13 +1242,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[5])
-                vfit=np.polyfit(t_av, velocities[5], 4)
+                vfit=np.polyfit(t_av, velocities[5], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(6,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Sittler & Guhathakurta Polar coronal hole Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[5],marker='o', linestyle='--')
@@ -1231,6 +1270,12 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global sgpfit
+                sgpfit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return sgpfit
+                
+                
             def Hybridmodel():
                 text.config(state=NORMAL)
                 time()
@@ -1238,11 +1283,11 @@ def analysis():
                 text.insert(tk.END,now+"    Hybrid model velocity values="+str(velocities[6])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="Hybrid Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(7,1,str(fppoly))
@@ -1251,7 +1296,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(7,2,str(drpoly))
@@ -1260,7 +1305,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[6])
-                htfit=np.polyfit(t, heights[6], 4)
+                htfit=np.polyfit(t, heights[6], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(7,3,str(htpoly))
@@ -1269,13 +1314,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[6])
-                vfit=np.polyfit(t_av, velocities[6], 4)
+                vfit=np.polyfit(t_av, velocities[6], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(7,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Hybrid model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[6],marker='o', linestyle='--')
@@ -1298,6 +1342,11 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global hybridfit
+                hybridfit=[fppoly,drpoly,htpoly,vpoly]
+                
+                return hybridfit
+                
                 
             def LeblancModel():
                 text.config(state=NORMAL)
@@ -1306,11 +1355,11 @@ def analysis():
                 text.insert(tk.END,now+"    Leblanc Model velocity values="+str(velocities[7])+"\n")
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                f=plt.figure(figsize=(10,10))
+                f=plt.figure(figsize=(10,10),num="LeBlanc Model")
                 
                 plt.subplot(321)
                 plt.scatter(t,fp)           #,marker='o',linestyle="--")
-                fpfit=np.polyfit(t, fp, 4)
+                fpfit=np.polyfit(t, fp, n)
                 fppoly=np.poly1d(fpfit)
                 ys=fppoly(t)
                 sheet1.write(8,1,str(fppoly))
@@ -1319,7 +1368,7 @@ def analysis():
                 
                 plt.subplot(322)
                 plt.scatter(t_av,drift)           
-                drfit=np.polyfit(t_av, drift, 4)
+                drfit=np.polyfit(t_av, drift, n-1)
                 drpoly=np.poly1d(drfit)
                 drplt=drpoly(t_av)
                 sheet1.write(8,2,str(drpoly))
@@ -1328,7 +1377,7 @@ def analysis():
                 
                 plt.subplot(323)
                 plt.scatter(t,heights[7])
-                htfit=np.polyfit(t, heights[7], 4)
+                htfit=np.polyfit(t, heights[7], n)
                 htpoly=np.poly1d(htfit)
                 htplt=htpoly(t)
                 sheet1.write(8,3,str(htpoly))
@@ -1337,13 +1386,12 @@ def analysis():
                 
                 plt.subplot(324)
                 plt.scatter(t_av,velocities[7])
-                vfit=np.polyfit(t_av, velocities[7], 4)
+                vfit=np.polyfit(t_av, velocities[7], n-1)
                 vpoly=np.poly1d(vfit)
                 vplt=vpoly(t_av)
                 sheet1.write(8,4,str(vpoly))
                 plt.plot(t_av,vplt)
                 plt.title("Velocity plot")
-                plt.suptitle("Leblanc Model")
                 
                 plt.subplot(313)
                 plt.plot(t,heights[7],marker='o', linestyle='--')
@@ -1366,7 +1414,14 @@ def analysis():
                 text.config(state=DISABLED)
                 
                 f.show()
+                global leblancfit
+                leblancfit=[fppoly,drpoly,htpoly,vpoly]
                 
+                return leblancfit
+                
+            
+            n=len(fp)-2
+            
             NewkirkModel()
             BaumbachAllen_Model1()
             BaumbachAllen_Model2()
@@ -1377,37 +1432,10 @@ def analysis():
             LeblancModel()
             
             time()
-            wb.save("GLOSS"+now+".xls")
+            wb.save("GLOSS--"+nowdt+"--fit_table.xlsx")
             
              
-#            child=tk.Toplevel()
-#            v=IntVar()
-#            child.wm_title("Select model:")
-#            child.geometry("450x200+500+400")
-#            R1 = Radiobutton(child, text="NewkirkModel",command=NewkirkModel,variable=v,value=1,font=12)  
-#            R1.pack( anchor = W )  
-#              
-#            R2 = Radiobutton(child, text="Baumbach-Allen Model1", command=BaumbachAllen_Model1,variable=v,value=2,font=12)  
-#            R2.pack( anchor = W )  
-#              
-#            R3 = Radiobutton(child, text="Baumbach-Allen Model2",command=BaumbachAllen_Model2,variable=v,value=3,font=12)  
-#            R3.pack( anchor = W) 
-#            R4 = Radiobutton(child, text="Saito Model",command=SaitoModel,variable=v,value=4,font=12)  
-#            R4.pack( anchor = W) 
-#            R5 = Radiobutton(child, text="Sittler & Guhathakurta Current Sheet model",command=SittleGuhathakurtaCurrent_model,variable=v,value=5,font=12)  
-#            R5.pack( anchor = W) 
-#            R6 = Radiobutton(child, text="Sittler & Guhathakurta Polar Coronal Hole model",command=SittleGuhathakurtaPolar_model,variable=v,value=6,font=12)  
-#            R6.pack( anchor = W) 
-#            
-#            R7 = Radiobutton(child, text="Hybrid model",command=Hybridmodel,variable=v,value=7,font=12)  
-#            R7.pack( anchor = W) 
-#            R8 = Radiobutton(child, text="Leblanc Model",command=LeblancModel,variable=v,value=8,font=12)  
-#            R8.pack( anchor = W) 
-#        
-#        else:
-#            messagebox.showerror('Enhancement factor neeeded','Enter an integer to proceed with calculation')
-#            
-#    
+
     else:    
         text.config(state=NORMAL)
         time()
@@ -1419,6 +1447,101 @@ def analysis():
         
 
 
+
+
+
+def analysis1():
+    global mainwin
+    mainwin=gloss
+    analysis(1)
+    enablinganalysn()
+
+
+def analysis_n():
+        
+    def clearval():
+        e1.delete(0,'end')
+    
+    def calc():
+        
+        Sc1=e1.get()
+        if Sc1.isnumeric() == True:
+            Sc1=float(Sc1)
+            global mainwin
+            mainwin=master
+            analysis(Sc1)
+            
+            tree.insert('','end',text="Newkirk Model",value=(str(newfit[0]),str(newfit[1]),str(newfit[2]),str(newfit[3])),tags='T')
+            tree.insert('','end',text="Baumbach-Allen Model 1",value=(str(ba1fit[0]),str(ba1fit[1]),str(ba1fit[2]),str(ba1fit[3])),tags='T')
+            tree.insert('','end',text="Baumbach-Allen Model 2",value=(str(ba2fit[0]),str(ba2fit[1]),str(ba2fit[2]),str(ba2fit[3])),tags='T')
+            tree.insert('','end',text="Saito Model",value=(str(saitofit[0]),str(saitofit[1]),str(saitofit[2]),str(saitofit[3])),tags='T')
+            tree.insert('','end',text="Sittler & Guhathakurta Current Sheet model",value=(str(sgcfit[0]),str(sgcfit[1]),str(sgcfit[2]),str(sgcfit[3])),tags='T')
+            tree.insert('','end',text="Sittler & Guhathakurta Polar coronal hole",value=(str(sgpfit[0]),str(sgpfit[1]),str(sgpfit[2]),str(sgpfit[3])),tags='T')
+            tree.insert('','end',text="Hybrid model",value=(str(hybridfit[0]),str(hybridfit[1]),str(hybridfit[2]),str(hybridfit[3])),tags='T')
+            tree.insert('','end',text="LeBlanc model",value=(str(leblancfit[0]),str(leblancfit[1]),str(leblancfit[2]),str(leblancfit[3])),tags='T')
+            
+            tree.tag_configure('T', font='Times 15')
+            
+            
+    
+        else:
+            text.config(state=NORMAL)
+            time()
+            text.insert(tk.END,now +'    Value Error ######## You should give a number!! Please enter a number'+'\n','warning')
+            text.see(tk.END)
+            text.config(state=DISABLED)
+            messagebox.showerror('Value Error','You should give a number!! Please enter a number')
+            
+            
+    master=tk.Tk()
+    master.geometry("%dx%d+%d+%d" % (2000, 800, 100, 100))
+    master.title("Fit equation table")
+    #master.resizable(0,0)
+    treeframe = tk.Frame(master)
+    treeframe.pack(fill=BOTH,expand=True)
+    
+    entry=Label(treeframe,text="Enter Enhancement Factor",font=("Times",15))
+    entry.pack(side=TOP,anchor=W)
+    e1=Entry(treeframe,width=15,font=("Times",15))
+    e1.pack(side=TOP,anchor=NW)
+    
+    
+    b1=tk.Button(treeframe, text='Calculate fit',font=("Times",15),command=calc)
+    b1.pack(side=TOP,anchor=W)
+    b2=tk.Button(treeframe, text='Clear', font=("Times",15), command=clearval)
+    b2.pack(side=TOP,anchor=W)
+    
+    style = Style(treeframe)
+    style.configure("mystyle.Treeview.Heading", font=("Times", 15))
+    style.configure("mystyle.Treeview", rowheight=60)    
+    tree=Treeview(treeframe,style="mystyle.Treeview")
+    
+    
+    
+    tree["columns"]=("one","two","three","four")
+    tree.column("#0", width=350, minwidth=200, stretch=tk.YES)
+    tree.column("one", width=300, minwidth=200, stretch=tk.YES)
+    tree.column("two", width=350, minwidth=200,stretch=tk.YES)
+    tree.column("three", width=300, minwidth=200, stretch=tk.YES)
+    tree.column("four", width=350, minwidth=200, stretch=tk.YES)
+        
+    tree.rowconfigure(1,weight=1)
+    tree.heading("#0",text="Models",anchor=tk.W)
+    tree.heading("one", text="Freq vs Time",anchor=tk.W)
+    tree.heading("two", text="Drift rate vs Time",anchor=tk.W)
+    tree.heading("three", text="Height vs Time",anchor=tk.W)
+    tree.heading("four", text="Velocity vs Time",anchor=tk.W)
+    
+    
+    tree.pack(side=tk.TOP,fill=tk.Y,expand=True)
+    
+    master.mainloop()
+        
+    
+    
+    
+    
+    
 def hms_to_hr(s):
     t = 0
     for u in s.split(':'):
@@ -1518,7 +1641,8 @@ manalys.add_command(label="Reset and Reselect",command=deletealldots,state=tk.DI
 #manalys.add_command(label="undo",command=undo)
 
 #manalys.add_command(label="Smoothing",command=plotFreq_time_smooth)
-manalys.add_command(label="Start",command=analysis,state=tk.DISABLED)
+manalys.add_command(label="Start",command=analysis1,state=tk.DISABLED)
+manalys.add_command(label="DiffFactor",command=analysis_n,state=tk.DISABLED)
 manalys.configure(font=("Times",18))
 
 mlasco=tk.Menu(menu)
