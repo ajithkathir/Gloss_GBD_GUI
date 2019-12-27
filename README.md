@@ -17,6 +17,20 @@ This is developed using python3 package tkinter.
 This tool is designed in such a way that only GLOSS data obtained from Gauribidanur Radio Observatory
 will work with this tool.
 
+################################################################################################3
+
+Just run the command 
+
+"bash setup"
+
+evrything needed will be installed and updated.
+
+
+################################################################################################
+
+
+
+                                      OR
 
 
 
