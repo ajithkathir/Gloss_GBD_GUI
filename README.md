@@ -64,7 +64,7 @@ If you have 'pip' installed, upgrade it by "python3 -m pip install --upgrade pip
 
 Now to install all the required packages for this plotting tool, run this command
 
-"pip3 install -r requirements.txt"
+"pip3 install <packagenames_in_setupfile>"
 
 in the terminal
 
