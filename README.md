@@ -1,11 +1,15 @@
-# ajith - aj97
-
+# Author :ajith - aj97
+# Contributors: Indrajit, Kathiravan, Anshu
 
                                 # # # # # # # # # # # # # # # # # # # # # # # # #  
                                 #                                               #    
                                 #   GLOSS Solar Type II events analysis tool    #
                                 #                                               # 
                                 # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
 
 
 
