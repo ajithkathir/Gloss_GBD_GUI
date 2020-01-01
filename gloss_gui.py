@@ -3,7 +3,10 @@
 """
 Created on Fri Sep  6 10:49:08 2019
 
-@author: ajith
+@author: Ajith
+
+@contributors: Indrajit, Kathiravan, Anshu
+
 """
 from tkinter.ttk import *
 import sys
@@ -79,11 +82,7 @@ def OpenFile():
         
                  
     return None
-    #if enable==1:
-    #    menu.entryconfigure(2, state=tk.NORMAL)
-    #else:
-     #   menu.entryconfigure(2, state=tk.DISABLED)
-
+    
 
 def enablingplot():
     menu.entryconfigure("Plot", state=tk.NORMAL)
@@ -146,11 +145,7 @@ def readnplot():
     def get_hours(time_str):
         h, m, s = time_str.split(':')
         return int(h) + int(m)/ 60.0 + int(s)/3600.0
-    #gloss_FITS_Filename="/home/gloss/GLOSS_fitsData/2018/1811/GLOSS_20181109T023020To20181109T114305.fits"
-    #filename = filedialog.askopenfilename(title='Select the input fits file')
-    #filename=fitsname
-    #filename=
-    
+   
         
     data =fits.open(file.name)
     hdr=data[0].header
@@ -174,8 +169,6 @@ def readnplot():
     stophr=get_hours(obser_stop)
     tt=np.array(time_freq.TIME)
     tt=tt[0:imdata.shape[1]]
-    #print(tt1[1])
-    #tt=np.linspace(starthr,stophr,hdr[3])
     
     
     ff=np.array(time_freq.FREQ)
@@ -186,35 +179,24 @@ def readnplot():
     
     for i in range(35,435):
        z.append(i)   
-    #fig=plt.figure(facecolor='black')  
+
     global fig
     fig=plt.figure(figsize=(15,6), dpi=100,facecolor='black')
-    #fig.subplots_adjust(0.07, 0.1, 1.09, 0.90, 0.2,0.2)
+
     global ax
     ax = plt.subplot2grid((4, 4), (0,0), rowspan=3,colspan=3)
     
-    #ax.axes([0.08, 0.08, 0.94-0.08, 0.94-0.08])
+
     x = plt.pcolormesh(tt, ff,imdata, cmap='jet', vmin=-50.1, vmax=-8)
-    #dummy=plt.pcolormesh(ttt, fff,imdata, cmap='jet', vmin=-50.1, vmax=-8)
-    #x=plt.imshow(imdata,aspect='auto',cmap='jet',origin='lower',extent=[2.5,12.5,35,435])
-    #=plt.imshow(imdata,aspect='auto',cmap='jet',origin='lower')
+
     plt.axis([tt[0], tt[imdata.shape[1]-1], ff[0], ff[imdata.shape[0]-1]])
-    #plt.xticks(np.arange(round(starthr,1),round(stophr,1),0.1))
-    #x=plt.imshow(imdata,aspect='auto',cmap='jet',origin='lower',extent=[2.5,11.5,35,435])
-    #plt.xticks(np.arange(0.0, 13.0, 1.0))
-    
-    #y=plt.colorbar(x,pad=0.05,aspect=50)
-    #y.ax.tick_params(colors='white',labelsize='6',width=0.1)
-    #y.set_label('Amplitude (dBm)',color='white')
-    
-    #ax.subplot_adjust()
     
     def on_xlims_change(axes):
         global centretime
         centretime=(ax.get_xlim()[0]+ax.get_xlim()[1])/2
         global ax1, ax2 #,ax3
         ax1.cla()
-        #ax1 = plt.subplot2grid((4, 4), (0, 3), rowspan=3,sharey=ax)
+
         ax1.set_title("Freq (in MHz) profile "+str(round(centretime,4))+"UT",fontsize="12",color="white")
         ax1.spines['bottom'].set_color('white')
         ax1.spines['right'].set_color('white')
@@ -223,21 +205,21 @@ def readnplot():
         ax1.plot(imdata[:,int(imdata.shape[1]/2)],ff)   
         ax1.invert_xaxis()
         ax1.set_xlabel('Amplitude (dBm)',color='white')
-        #ax1=fig.add_subplot(332)
+
     
     
     def on_ylims_change(axes):
         global centrefreq
         centrefreq=(ax.get_ylim()[0]+ax.get_ylim()[1])/2
         ax2.cla()
-        #ax2 = plt.subplot2grid((4, 4), (3, 0), colspan=3,sharex=ax)
+
         ax2.set_xlabel("Time (in UT) profile at "+str(round(centrefreq,4))+"MHz",fontsize="12",color="white")
         ax2.spines['bottom'].set_color('white')
         ax2.spines['left'].set_color('white')
         ax2.tick_params(axis='x', colors='white')
         ax2.tick_params(axis='y', colors='white')
         ax2.set_ylabel('Amplitude (dBm)',color='white')
-        #ax3 = plt.subplot2grid((4, 4), (3, 3))
+
         ax2.plot(tt,imdata[int(imdata.shape[0]/2),:])
         
         
@@ -250,21 +232,16 @@ def readnplot():
     ax.spines['left'].set_color('white')
     ax.tick_params(axis='x', colors='white')
     ax.tick_params(axis='y', colors='white')
-    #ax.yaxis.tick_right()
+
     plt.xticks(fontsize='10')
     plt.yticks(fontsize='10')
-    #plt.yticks(np.arange(round(ff[0],1),round(ff[400]+0.1,1), 10))
+
     
     plt.title('Gauribidanur LOw frequency Solar Spectrum'+' -- '+hdr[8],fontsize="14",color='white')
-    #w = Scale(gloss, from_=min(x), to=max(x),orient=tk.HORIZONTAL)
-    #w.pack()
-    
-    #plt.xlabel('Time(UT)',fontsize="8",color='white')
-    
+   
     plt.ylabel('Frequency(MHz)',fontsize="12",color='white')
     plt.grid(True)
-    #fig.savefig(Output_image_folder+'GBD_DSPEC_'+str(hdr[8]).replace('/',"") +'.jpeg', dpi=100, facecolor='black', edgecolor='w',orientation='landscape', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1,frameon=None)  
-    #plt.show()
+
     global ax1, ax2 #,ax3
     ax1 = plt.subplot2grid((4, 4), (0, 3), rowspan=3,sharey=ax)
     ax1.set_title("Freq (in MHz) profile "+str(round(tt[int(tt.shape[0]/2)],5))+"UT",fontsize="12",color="white")
@@ -276,7 +253,7 @@ def readnplot():
     ax1.invert_xaxis()
     ax1.set_xlabel('Amplitude (dBm)',color='white')
     ax1.yaxis.set_ticks_position('right')
-    #ax1=fig.add_subplot(332)
+
     ax2 = plt.subplot2grid((4, 4), (3, 0), colspan=3,sharex=ax)
     ax2.spines['bottom'].set_color('white')
     ax2.spines['left'].set_color('white')
@@ -284,7 +261,7 @@ def readnplot():
     ax2.tick_params(axis='y', colors='white')
     ax2.set_ylabel('Amplitude (dBm)',color='white')
     
-    #ax3 = plt.subplot2grid((4, 4), (3, 3))
+
     ax2.plot(tt,imdata[int(imdata.shape[0]/2),:])
     ax2.set_xlabel("Time (in UT) profile at "+str(round(ff[int(ff.shape[0]/2)],5))+"MHz",fontsize="12",color="white")
     
@@ -300,7 +277,7 @@ def readnplot():
     toolbar = NavigationToolbar2Tk(canvas,gloss)
     toolbar.update()
     canvas.get_tk_widget().pack(anchor=tk.S,fill=tk.BOTH, expand=True)
-    #mainFrame.pack()
+
     
     enablinganalysis()
     enablingclear()
@@ -317,7 +294,7 @@ def clear():
         
         canvas.get_tk_widget().pack_forget()
         canvas._tkcanvas.pack_forget()       
-        #mainFrame.pack_forget()       
+
         toolbar.destroy()
         text.config(state=NORMAL)
         time()
@@ -376,23 +353,15 @@ evnts=[]
 
 
 def analysisclick():
-    
-#    global counter,undone
-#    counter=1
-#    undone=[]
-    
-        #disablingdelete()
      
-    
     if stop==False:
         def onclick(event):
             
-            #global time,freq
+
             enablingstart()
             xdata=event.xdata
             ydata=event.ydata
-            #enablingdelete()
-            #print(xdata,ydata)
+            
             if xdata==None:
                 time()
                 text.config(state=NORMAL)
@@ -411,23 +380,17 @@ def analysisclick():
                 fp1=(round(ydata,5))
                 t1=(round(xdata,5))
                 t2=None
-                #print(fp1,t1)
+
                 global x1,y1
                 x1=event.x
-                #print(x1)
+
                 y1=event.y
-                #print(y1)
-                
-                #fig.canvas.get_tk_widget().create_rectangle(x1-3,canvas.get_tk_widget().winfo_height() - (y1-3),x1+3,canvas.get_tk_widget().winfo_height() - (y1+3),fill="red",tags=["dot","dot1"])
-#                global reddot
-#                reddot=1
-#                #counter +=1
+
                 ax1.cla()
                 ax2.cla()
-                #print(event.xdata)
-                #print(round(event.xdata,6))
+                
                 time_indx=np.where(tt==find_nearest(tt,xdata))
-                #print(time_indx[0][0])
+
                 freq_indx=np.where(ff==find_nearest(ff,ydata))
                 
                 cut1=np.linspace(0,(imdata.shape[0]-1),imdata.shape[0])
@@ -454,11 +417,9 @@ def analysisclick():
                 ax2.tick_params(axis='y', colors='white')
                 
                 
-                #print("yes")
-                #print(fp)
+              
                 enablingdelete()
-                #disablingselect()
-                #print(fp)
+              
             elif xdata>1 and ydata<1:
                 #print(reddot)
                 global x2,y2
@@ -467,8 +428,7 @@ def analysisclick():
                 global xdata2
                 xdata2=event.xdata
                 t2=round(xdata2,5)
-                #if reddot==True:
-                #fig.canvas.get_tk_widget().delete("dot2")
+              
                 t.append(t2)
                 fp.append(fp1)
                 time()
@@ -478,20 +438,15 @@ def analysisclick():
                 #text.insert(tk.END,now+'    Freq selected : '+str(round(ydata,5))+'\n')
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                #print(xdata2)
-                #print(t)
+               
                 fig.canvas.get_tk_widget().create_rectangle(x2-3,canvas.get_tk_widget().winfo_height() - (y1-3),x2+3,canvas.get_tk_widget().winfo_height() - (y1+3),fill="black",tags=["dot","dot3"])
-                #fig.canvas.get_tk_widget().create_line(x2,canvas.get_tk_widget().winfo_height() - (y1),x2+3,canvas.get_tk_widget().winfo_height() - (y1+3),fill="black",tags=["dot","dot3"])
+
                 
                 evnts.append(x2)
                 evnts.append(canvas.get_tk_widget().winfo_height() - (y1))
                 #else:
                     
-            #elif xdata<1 and ydata>1:
-             #   x2=event.x
-              #  y2=event.y
-               # fig.canvas.get_tk_widget().create_rectangle(x1-3,canvas.get_tk_widget().winfo_height() - (y2-3),x1+3,canvas.get_tk_widget().winfo_height() - (y2+3),fill="green",tags=["dot"])
-             
+            
                 
             else:
                 #print(reddot)
@@ -522,18 +477,13 @@ def analysisclick():
                 #text.insert(tk.END,now+'    Freq selected : '+str(round(ydata,5))+'\n')
                 text.see(tk.END)
                 text.config(state=DISABLED)
-                #print(xdata2)
-                #print(t)
+                
                 fig.canvas.get_tk_widget().create_rectangle(x2-3,canvas.get_tk_widget().winfo_height() - (y1-3),x2+3,canvas.get_tk_widget().winfo_height() - (y1+3),fill="black",tags=["dot","dot3"])
                 global reddot
                 reddot=0
                 
             
         fig.canvas.mpl_connect('button_press_event', onclick)
-        #button1 = Button(gloss, text = "UPDATE", command = update, anchor = W)
-        #button1.configure(width = 10, activebackground = "#33B5E5", relief = FLAT)
-        #button1_window = canvas.get_tk_widget().create_window(15, 15, anchor=NW, window=button1)
-        #fig.canvas.get_tk_widget().bind("<Button-3>", deletealldots)
         text.config(state=NORMAL)
         time()
         text.insert(tk.END,now+"    Please select points from figure"+"\n")
@@ -565,7 +515,7 @@ def deletealldots():
         text.see(tk.END)
         text.config(state=DISABLED)
         
-        #messagebox.showinfo('Selected points deleted', "Frequency and Time values are empty. Continue to Select points from figure")
+        messagebox.showinfo('Selected points deleted', "Frequency and Time values are empty. Continue to Select points from figure")
 
         disablingstart() 
         disablingdelete()
@@ -635,20 +585,11 @@ def analysis(Sc):
                 r0 = r0 - dr    # updating the value of x
                 count = count + 1    # incrimenting the counter
                 p[count]=r 
-                # drawnow();
-                # plot(abs(p),'r','linewidth',3);
-                # grid;
                 if (count > 300):
                     print('Error...! Solution not converging !!! \\n')       # printing the error message
                     break
                 
             
-                    # plot(abs(p));
-                    # if (count < 300)
-                    #     fprintf('The solution = ');  %printing the result
-                    #     x
-                    #     fprintf('\nNumber of itration taken = %d\n',count);
-                    # end
                     
             return r0
     
@@ -656,16 +597,9 @@ def analysis(Sc):
     
         
         
-        #clc()
-        #clear(mstring('all'))
-        #format(mstring('long'))
-        #syms(mstring('r'))
-        #fp=input('Enter the plasma frequency : ')%fp=70;                        % plasma frequency
             
         r=Symbol('r')
         
-        #fp=linspace(50,120,100);
-        #fp=[51,54,58,61,64,68,71,74,78,81,84,88,113,140,143,147,150,153,160,164,167,170,174,177,183,189,191,194,197,201,204,208,211,214,218,221,224,228,231,241,244,248,251,254,258,260,264,267,270,277,290,300,304,307,310,314,324,327,330,334,337,340,344,347,357,367,370,374,380,384,387,390,394,397,400,404]
         Ne = (np.divide(fp,(9 * 10 ** (-3))))** 2# electron density from plasma frequency
         
         #fp = sqrt(Ne(i))*(9*10^(-3)) 
@@ -697,7 +631,7 @@ def analysis(Sc):
                 # Baumbach-Allen model 1
             
                 BA1 = (1.55*(r** (-6)) + 2.99 * (r ** (-16)) + 0.036 * (r ** (-1.5))) - (Ne[i] / Sc * (10 ** (-8)))
-                #BA1=(10^14)*(1.55*r^(-6)+2.99*r^(-16))-(Ne(i)*10^6) ;
+
             
                 Hba1[i]=newton_raphson(BA1) #,itr[2]
             
@@ -718,13 +652,13 @@ def analysis(Sc):
                
                 
                 Hsa[i]=newton_raphson(SA)
-                #newton_raphson(SA)[1]= itr[3]
+
             
                 # Hybrid model
             
                 HYB = 15.45 * r ** (-16) + 3.16 * r ** (-6) + r ** (-4) + 0.0033 * r ** (-2) - Ne[i] / (Sc * (10 ** 8))
                 Hhy[i]=newton_raphson(HYB)
-                #newton_raphson(HYB)[1]= itr[4] 
+
             
                 # Sittler & Guhathakurta model 
             
@@ -752,39 +686,15 @@ def analysis(Sc):
                 SGc = rho0 * (ac1 * (zr ** 2) * exp(ac2 * zr) * (1 + ac3 * zr + ac4 * zr ** 2 + ac5 * zr ** 3)) - Ne[i] / Sc#% current sheet model
             
                 Hsgp[i]=newton_raphson(SGp)
-                #,newton_raphson(SGp)[1]=, itr[5]
-            
+              
                 Hsgc[i]=newton_raphson(SGc)
-                #,newton_raphson(SGc)[1]= , itr[6] 
-            
+              
                 #Leblanc
             
                 LB = 3.3e5 * r ** -2 + 4.1e6 * r ** -4 + 8e7 * r ** -6 - Ne[i] / Sc
             
                 Hlb[i]=newton_raphson(LB)
-                #,newton_raphson(BA1)[1]=, itr[7] 
-            
-            
-                # A1=2.855e8;
-                # P1=7.142;
-                # anshu=A1*r^(-P1) - Ne(i)/Sc ;
-                # [anshu_h(i),itr7]=newton_raphson(anshu) ;
-            
-            
-                # A1 = 1.521*10^8 ; a1 = 7.279 ;
-                # A2 = 1.84*10^8 ; a2 = 7.938 ;
-                # A3 = 2.07*10^7 ; a3 = 4.852 ;
-                # A4 = 7.52*10^5 ; a4 = 2.024 ;
-                # 
-                # 
-                # WANG = A1*r^(-a1) + A2*r^(-a2) + A3*r^(-a3) + A4*r^(-a4)- Ne(i)/Sc ;
-                # 
-                # [Hwang(i),itr8]=newton_raphson(WANG) ;
-            
-            
-                #heights=vertcat(Hnk,Hba1,Hba2,Hsa,Hsgp,Hsgc,Hhy,Hlb)';
-                #heights = 
-                
+                      
                 
             drift=np.zeros(len(fp)-1)
             for i in range(len(fp)-1):
@@ -1601,7 +1511,7 @@ gloss.minsize(1600,600)
 gloss.title('GLOSS plotting tool')
 scrollbar = Scrollbar(gloss)
 scrollbar.pack(side=RIGHT, fill=Y)
-#gloss.configure(background="white")
+
 mainFrame = tk.Frame(gloss)
 mainFrame.pack()
 
@@ -1615,10 +1525,6 @@ text.insert(tk.END,"                            LOGGER \n","title")
 text.insert(tk.END,"Plotting tool opened at:"+now+"\n","title")
 text.insert(tk.END,"--------------------------------------------------------- \n","title")
 text.config(state=DISABLED)
-
-#global counter,undone
-#counter=1
-#undone=[]
 
 
 menu = tk.Menu(gloss)
@@ -1639,9 +1545,7 @@ manalys.add_command(label="Median substraction",command=mediansub)
 manalys.add_command(label="Select points",command=analysisclick)
 
 manalys.add_command(label="Reset and Reselect",command=deletealldots,state=tk.DISABLED)
-#manalys.add_command(label="undo",command=undo)
 
-#manalys.add_command(label="Smoothing",command=plotFreq_time_smooth)
 manalys.add_command(label="Start",command=analysis1,state=tk.DISABLED)
 manalys.add_command(label="DiffFactor",command=analysis_n,state=tk.DISABLED)
 manalys.configure(font=("Times",18))
@@ -1658,7 +1562,6 @@ menu.add_command(label="Clear", command=clear,state=tk.DISABLED)
 menu.add_command(label="Close", command=close)
 menu.configure(background="black",foreground='white',font=("Times",18))    
 gloss.config(menu=menu)
-#gloss.option_add('*Dialog.msg.width', 50)
 gloss.option_add('*Dialog.msg.font', 'Times 15')
 messagebox.showinfo("Welcome to GLOSS plotting tool", "This tool is designed and developed for plotting GLOSS spectrograph data and analysis of typeII solar event")
 
