@@ -1,4 +1,4 @@
-# Author :ajith - aj97
+# Author : Ajith Sampath
 # Contributors: Indrajit, Kathiravan, Anshu
 
                                 # # # # # # # # # # # # # # # # # # # # # # # # #  
